@@ -20,7 +20,6 @@ RUN curl -L --silent ${JMETER_DOWNLOAD_URL} >  /tmp/jmeter/apache-jmeter-${JMETE
 
 ENV RMI_PORT=1099
 ENV MY_IP=127.0.0.1
-ENV JVM_ARGS
 
 EXPOSE ${RMI_PORT}
 
