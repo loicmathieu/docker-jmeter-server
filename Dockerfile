@@ -1,22 +1,25 @@
-FROM openjdk:11
+FROM openjdk:11-slim
 
-MAINTAINER Loïc Mathieu <loicmathieu@free.fr>
+LABEL maintainer="Loïc Mathieu <loicmathieu@free.fr>"
 
-ARG JMETER_VERSION="5.1"
-ARG JMETER_PLUGIN_VERSION="1.4.0"
+ARG JMETER_VERSION="5.0"
 ARG JMETER_DOWNLOAD_URL=https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-${JMETER_VERSION}.tgz
-ARG JMETER_PLUGIN_DOWNLOAD_URL=https://jmeter-plugins.org/downloads/file/JMeterPlugins-Standard-${JMETER_PLUGIN_VERSION}.zip
 
 ENV JMETER_HOME=/opt/apache-jmeter-${JMETER_VERSION}
 ENV JMETER_BIN=${JMETER_HOME}/bin
 
+# Install curl
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+
 # Install JMeter
-RUN curl -L --silent ${JMETER_DOWNLOAD_URL} >  /tmp/jmeter/apache-jmeter-${JMETER_VERSION}.tgz  \
-  && curl -L --silent ${JMETER_PLUGIN_DOWNLOAD_URL} >  /tmp/jmeter/JMeterPlugins-Standard-${JMETER_PLUGIN_VERSION}.zip \
+RUN mkdir /tmp/jmeter \
+  && curl -L --silent ${JMETER_DOWNLOAD_URL} >  /tmp/jmeter/apache-jmeter-${JMETER_VERSION}.tgz  \
   && mkdir -p /opt  \
   && tar -xzf /tmp/jmeter/apache-jmeter-${JMETER_VERSION}.tgz -C /opt  \
-  && unzip /tmp/jmeter/JMeterPlugins-Standard-${JMETER_PLUGIN_VERSION}.zip /opt/apache-jmeter-${JMETER_VERSION}/lib/ext \
   && rm -rf /tmp/jmeter
+
+# Add plugins
+COPY plugins/ ${JMETER_HOME}/lib/ext
 
 ENV RMI_PORT=1099
 ENV MY_IP=127.0.0.1
